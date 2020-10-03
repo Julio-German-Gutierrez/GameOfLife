@@ -21,8 +21,9 @@ namespace GameOfLife
 
             Pattern(68, 13);
 
-            Print(world);
-            Console.ReadKey();
+            Print(world, true);
+            Console.Write("Press any key to START...");
+            Console.ReadKey(true);
 
             Timer timer = new Timer(NextStep, new AutoResetEvent(false), 1000, 250);
 
@@ -112,7 +113,7 @@ namespace GameOfLife
             return newState;
         }// End IsAlive()
 
-        static void Print(bool[,] worldToPrint)
+        static void Print(bool[,] worldToPrint, bool intro = false)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Clear();
@@ -126,6 +127,7 @@ namespace GameOfLife
                 }
                 Console.WriteLine();
             }
+            if (!intro) System.Console.Write("Press any key to EXIT...");
         }
 
         static void Pattern(int x, int y)
