@@ -43,14 +43,9 @@ namespace GameOfLife
 
             Print(newWorld);
 
-            for (int y = 0; y < world.GetLength(0); y++)
-            {
-                for (int x = 0; x < world.GetLength(1); x++)
-                {
-                    world[y, x] = newWorld[y, x];
-                    newWorld[y, x] = false;
-                }
-            }
+            world = newWorld;
+
+            newWorld = new bool[40, 150];
         }
 
         static bool IsAlive(int x, int y)
