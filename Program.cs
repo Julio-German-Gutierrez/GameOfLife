@@ -6,6 +6,7 @@ namespace GameOfLife
     class Program
     {
         static bool[,] world = new bool[40, 150];
+        static bool[,] newWorld = new bool[40, 150];
 
         static void Main(string[] args)
         {
@@ -14,12 +15,13 @@ namespace GameOfLife
                 for (int x = 0; x < world.GetLength(1); x++)
                 {
                     world[y,x] = false;
+                    newWorld[y,x] = false;
                 }
             }
 
             Pattern(68, 13);
 
-            Print();
+            Print(world);
             Console.ReadKey();
 
             Timer timer = new Timer(NextStep, new AutoResetEvent(false), 1000, 250);
@@ -34,35 +36,53 @@ namespace GameOfLife
             {
                 for (int x = 0; x < world.GetLength(1); x++)
                 {
-                    world[y,x] = IsAlive(x, y);
+                    newWorld[y,x] = IsAlive(x, y);
                 }
             }
 
-            Print();
+            Print(newWorld);
+
+            for (int y = 0; y < world.GetLength(0); y++)
+            {
+                for (int x = 0; x < world.GetLength(1); x++)
+                {
+                    world[y, x] = newWorld[y, x];
+                    newWorld[y, x] = false;
+                }
+            }
         }
 
         static bool IsAlive(int x, int y)
         {
             bool state = world[y, x];
             bool newState = state;
-            int alive = 0;
+            int aliveAround = 0;
 
             for (int i = y - 1; i <= y + 1; i++)
             {
                 for (int j = x - 1; j <= x + 1; j++)
                 {
-                    try
+                    if (x == j && y == i)
                     {
-                        alive += (world[i, j])? 1: 0; 
+                        ;
                     }
-                    catch (System.Exception)
+                    else
                     {
-                        //throw;
+                        try
+                        {
+                            //aliveAround += (world[i, j])? 1: 0; 
+                            if(world[i, j]) aliveAround++;
+                        }
+                        catch (System.Exception)
+                        {
+                            //throw;
+                        }
                     }
+                    
                 }
             }
 
-            switch (alive)
+            switch (aliveAround)
             {
                 case 0:
                 case 1:
@@ -84,13 +104,29 @@ namespace GameOfLife
                 }
                 default:
                 {
-                    if(state) newState = false;
+                    newState = false;
                     break;
                 }
             }
 
             return newState;
         }// End IsAlive()
+
+        static void Print(bool[,] worldToPrint)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Clear();
+
+            for (int y = 0; y < worldToPrint.GetLength(0); y++)
+            {
+                for (int x = 0; x < worldToPrint.GetLength(1); x++)
+                {
+                    if(worldToPrint[y,x]) Console.Write("\u2588");
+                    else Console.Write(" ");
+                }
+                Console.WriteLine();
+            }
+        }
 
         static void Pattern(int x, int y)
         {
@@ -456,22 +492,6 @@ namespace GameOfLife
             world[y + 5 + 7, x + 3 + 7] = true;
             world[y + 5 + 7, x + 4 + 7] = false;
             world[y + 5 + 7, x + 5 + 7] = false;
-        }
-
-        static void Print()
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Clear();
-
-            for (int y = 0; y < world.GetLength(0); y++)
-            {
-                for (int x = 0; x < world.GetLength(1); x++)
-                {
-                    if(world[y,x]) Console.Write("\u2588");
-                    else Console.Write(" ");
-                }
-                Console.WriteLine();
-            }
         }
     }
 }
