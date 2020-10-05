@@ -23,13 +23,13 @@ namespace GameOfLife
             }
 
             //Pattern(68, 13);
-            LoadPattern(world, "Pattern 2.txt");
+            LoadPattern(world, "/home/lalegion/DotNET/Lektioner/GameOfLife/Pattern 2.txt");
 
             Print(world, true);
             Console.Write("Press any key to START...");
             Console.ReadKey(true);
 
-            Timer timer = new Timer(NextStep, new AutoResetEvent(false), 1000, 500);
+            Timer timer = new Timer(NextStep, new AutoResetEvent(false), 1000, 250);
 
             Console.ReadKey();
 
@@ -37,9 +37,9 @@ namespace GameOfLife
 
         static void NextStep(Object stateInfo)
         {
-            for (int y = 0; y < world.GetLength(0); y++)
+            for (int y = 0; y < newWorld.GetLength(0); y++)
             {
-                for (int x = 0; x < world.GetLength(1); x++)
+                for (int x = 0; x < newWorld.GetLength(1); x++)
                 {
                     newWorld[y, x] = IsAlive(x, y);
                 }
@@ -131,32 +131,43 @@ namespace GameOfLife
 
         static void LoadPattern(bool[,] w, string openFile)
         {
-            FileStream r = File.OpenRead(openFile);
-            StreamReader sr = new StreamReader(r);
-            string firstLine = sr.ReadLine();
-            int width = 0;
-            int height = 0;
+            FileStream f = File.OpenRead(openFile);
+            StreamReader sr = new StreamReader(f);
+            string[] infoPattern = sr.ReadLine().Split(":");
+            int width = int.Parse(infoPattern[1]);
+            int height = int.Parse(infoPattern[2]);
 
-            if (firstLine.Substring("Start Pattern 1:"))
+            bool[,] pattern = new bool[height, width];
+
+            //string line;
+            char[] c;
+
+            for (int y = 0; y < pattern.GetLength(0); y++)
             {
+                c = sr.ReadLine().ToCharArray();
 
-                string newLine = sr.ReadLine();
-                width = newLine.Length;
-
-                char c;
-                while (c = sr.Read() != 'E')
+                for (int x = 0; x < pattern.GetLength(1); x++)
                 {
-                    if (c != '\n')
-                    {
-
-                    }
-                    else
-                    {
-                        height++;
-                    }
+                    pattern[y, x] = (c[x] == '\u2588');
                 }
-
             }
+
+            //Copy pattern into world.
+            int newY = w.GetLength(0) / 2 - height / 2;
+            int newX = w.GetLength(1) / 2 - width / 2;
+
+            for (int y = newY; y < pattern.GetLength(0) + newY; y++)
+            {
+                for (int x = newX; x < pattern.GetLength(1) + newX; x++)
+                {
+                    w[y, x] = pattern[y - newY, x - newX];
+                }
+            }
+
+            f.Close();
+            sr.Close();
+            f.Dispose();
+            sr.Dispose();
         }
 
         static void SavePattern(bool[,] w, string fileName)
@@ -178,7 +189,7 @@ namespace GameOfLife
             f.Close();
         }
 
-        static void Pattern(int x, int y)
+        /* static void Pattern(int x, int y)
         {
             world[y, x] = false;
             world[y, x + 1] = false;
@@ -359,6 +370,6 @@ namespace GameOfLife
             world[y + 5 + 7, x + 3 + 7] = true;
             world[y + 5 + 7, x + 4 + 7] = false;
             world[y + 5 + 7, x + 5 + 7] = false;
-        }
+        } */
     }
 }
