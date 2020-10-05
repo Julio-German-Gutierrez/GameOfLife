@@ -26,11 +26,37 @@ namespace GameOfLife
             string fileName = SelectPattern();
 
             string path = "./";
-            LoadPattern(world, path + "Pattern 2.gol");
+            bool control = true;
+            if (fileName != null)
+            {
+                LoadPattern(world, path + fileName);
+                Print(world, true);
+                Console.Write("Press any key to START...");
+                Console.ReadKey(true);
+            }
+            else
+            {
+                while (control)
+                {
+                    RandomWorld(world);
+                    Print(world, true);
+                    Console.Write("Press any key to RANDOMIZE or ENTER to start...");
+                    ConsoleKeyInfo k = Console.ReadKey(true);
+                    switch (k.Key)
+                    {
+                        case ConsoleKey.Enter:
+                            {
+                                control = false;
+                                break;
+                            }
+                        default:
+                            break;
+                    }
+                }
 
-            Print(world, true);
-            Console.Write("Press any key to START...");
-            Console.ReadKey(true);
+            }
+
+
 
             Timer timer = new Timer(NextStep, new AutoResetEvent(false), 1000, 250);
 
@@ -39,18 +65,48 @@ namespace GameOfLife
             Console.Clear();
         }
 
+        static void RandomWorld(bool[,] w)
+        {
+            for (int y = 10; y < 10 + 20; y++)
+            {
+                for (int x = 55; x < 95; x++)
+                {
+                    w[y, x] = (new Random().Next(0, 2) == 0) ? false : true;
+                }
+            }
+        }
+
         static string SelectPattern()
         {
-            var files = System.IO.Directory.EnumerateFiles("./");
+            string ret;
+
+            var files = System.IO.Directory.EnumerateFiles("./", "*.gol");
+            List<string> lista = new List<string>();
+
             foreach (string f in files)
             {
-                //if (f.Contains(".gol")) System.Console.WriteLine(f);
-                System.Console.WriteLine(f);
+                lista.Add((string)f);
             }
-            System.Console.Write("\nPress any key to continue...");
-            Console.ReadKey(true);
 
-            return "Listo";
+            int num = 1;
+            foreach (string s in lista)
+            {
+                System.Console.WriteLine($" PRESS {num++} : " + s.Substring(2));
+            }
+            System.Console.WriteLine(" PRESS R : RANDOM");
+            System.Console.Write("\nPress any key to continue...");
+            string option = Console.ReadLine();
+
+            if (option.ToLower() != "r")
+            {
+                ret = "Pattern " + option + ".gol";
+            }
+            else
+            {
+                ret = null;
+            }
+
+            return ret;
         }
 
         static void NextStep(Object stateInfo)
